@@ -2,6 +2,7 @@ import { IncomingMessage, ServerResponse } from 'node:http';
 
 export class CustomRequest extends IncomingMessage {
   params: Record<string, string> = {};
+  body: any | undefined = undefined;
 }
 
 export type CustomRequestListener<
@@ -13,3 +14,9 @@ export type CustomRequestListener<
 ) => void;
 
 export type CustomResponse = ServerResponse & { req: CustomRequest };
+
+export interface UserData {
+  username: string;
+  age: number;
+  hobbies: string[];
+}

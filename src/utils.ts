@@ -1,3 +1,5 @@
+import { Stream } from 'stream';
+
 const checkUrl = (url: string, route: string) => {
   let regex = route.replace(/:([^/]+)/g, (_, cg) => `(?<${cg}>[/\\w%]+)`);
   regex = `^${regex}$`;
@@ -9,15 +11,6 @@ export const getRoute = (url: string, routes: string[]) => {
   const route = routes.find((item) => checkUrl(url, item));
   return route;
 };
-
-export class AppError extends Error {
-  isSkippable: boolean;
-
-  constructor(message: string) {
-    super(message);
-    this.isSkippable = true;
-  }
-}
 
 interface Variable {
   index: number;
@@ -42,4 +35,23 @@ export const getVariables = (url: string, route: string) => {
   }, []);
 
   return result;
+};
+
+export const getBody = async (stream: Stream): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    let body = '';
+
+    stream.on('data', (chunk) => {
+      body += chunk;
+    });
+
+    stream.on('end', () => {
+      if (!!body.length) {
+        resolve(JSON.parse(body));
+      }
+      resolve({});
+    });
+
+    stream.on('error', reject);
+  });
 };

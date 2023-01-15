@@ -1,16 +1,14 @@
 import { server } from './app';
+import { config } from './config';
+import { addUser, getUser, getUsers } from './controllers';
 
-console.log('start');
+if (!config.PORT) throw new Error('Set port in .env');
+
 console.clear();
 
-server.get('/user/:id/', async (req, res) => {
-  res.writeHead(200);
-  res.end('Users');
-});
+server.get('/api/user/:id', getUser);
+server.get('/api/user', getUsers);
 
-server.get('/user', async (_req, res) => {
-  res.writeHead(200);
-  res.end('User');
-});
+server.post('/api/users', addUser)
 
-server.listen(8000);
+server.listen(Number(config.PORT));
