@@ -1,7 +1,8 @@
-import http, { IncomingMessage, ServerResponse, RequestListener, Server } from 'node:http';
-import { AppError, getRoute } from './utils';
+import http, { Server } from 'node:http';
+import { CustomRequest, CustomRequestListener, CustomResponse } from './types';
+import { AppError, getRoute, getVariables } from './utils';
 
-type Handler = Record<string, RequestListener>;
+type Handler = Record<string, CustomRequestListener>;
 
 enum METHOD {
   DELETE = 'DELETE',
@@ -24,30 +25,33 @@ class App {
     this.server = http.createServer();
   }
 
-  get(route: string, handler: RequestListener) {
+  get(route: string, handler: CustomRequestListener) {
     this.handlers.GET[route] = handler;
   }
 
-  async handler(req: IncomingMessage, res: ServerResponse) {
+  async handler(req: CustomRequest, res: CustomResponse) {
     const { url, method } = req;
-    if (!url || !method) return res.writeHead(404).end();
+    if (!url || !method) throw new AppError('Wrong url');
 
     const methodRoutes = this.handlers[req.method as METHOD];
     const routes = Object.keys(methodRoutes);
 
     const route = getRoute(url, routes);
-    console.log('route: ', route);
 
     const handler = route ? methodRoutes[route] : null;
 
-    if (!handler) throw new AppError('Wrong url');
+    if (!handler || !route) throw new AppError('Wrong url');
 
-    handler(req, res);
+    const variables = getVariables(url, route);
+    console.log('variables: ', variables);
 
-    // handler(req, res)
+    variables.forEach((item) => {
+      if (!req.params) req.params = {};
+      req.params[item.name] = item.value;
+    });
 
     try {
-      // if (this.handlers[req.url]) return this.handlers[req.url](req, res);
+      await handler(req, res);
       res.writeHead(404).end();
     } catch (error) {
       console.log('error: ', error);
@@ -58,13 +62,12 @@ class App {
     this.server.listen(port);
     this.server.on('request', async (req, res) => {
       try {
-        await this.handler(req, res);
+        await this.handler(req as CustomRequest, res as CustomResponse);
       } catch (error) {
         if (!(error instanceof AppError)) throw error;
         res.writeHead(404).end();
       }
     });
-    // this.server.on('request', this.handler.bind(this));
 
     this.server.on('error', (err) => {
       if (!(err instanceof AppError)) throw err;

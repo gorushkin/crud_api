@@ -3,7 +3,7 @@ import { server } from './app';
 console.log('start');
 console.clear();
 
-server.get('/users/:id/data', async (_req, res) => {
+server.get('/user/:id/', async (req, res) => {
   res.writeHead(200);
   res.end('Users');
 });
