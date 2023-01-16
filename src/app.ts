@@ -1,7 +1,8 @@
 import http, { Server } from 'node:http';
-import { AppError } from './error';
+import { AppError, errorHandler } from './error';
 import { CustomRequest, CustomRequestListener, CustomResponse } from './types';
 import { getBody, getRoute, getVariables } from './utils';
+import { addUser, deleteUser, getUser, getUsers, updateUser } from './controllers';
 
 type Handler = Record<string, CustomRequestListener>;
 
@@ -43,6 +44,7 @@ class App {
   }
 
   async handler(req: CustomRequest, res: CustomResponse) {
+    console.log('req: ', req);
     const { url, method } = req;
     if (!url || !method) throw new AppError(404, 'Wrong url');
 
@@ -91,5 +93,14 @@ class App {
 }
 
 const server = new App();
+
+server.get('/api/user/:id', errorHandler.bind(null, getUser));
+server.get('/api/user', errorHandler.bind(null, getUsers));
+
+server.post('/api/user', errorHandler.bind(null, addUser));
+
+server.put('/api/user/:id', errorHandler.bind(null, updateUser));
+
+server.delete('/api/user/:id', errorHandler.bind(null, deleteUser));
 
 export { server };
