@@ -20,7 +20,6 @@ class DB {
   db: User[];
   constructor() {
     this.db = [];
-    this.addUser({ age: 23, hobbies: [], username: 'Ivan' });
   }
 
   async getUsers() {

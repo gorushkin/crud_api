@@ -78,13 +78,12 @@ class App {
         await this.handler(customRequest, res as CustomResponse);
       } catch (error) {
         if (!(error instanceof AppError)) throw error;
-        res.writeHead(error.statusCode).end(error.message);
+        res.writeHead(error.statusCode).end({ message: error.message });
       }
     });
 
     this.server.on('error', (err) => {
       if (!(err instanceof AppError)) throw err;
-      // console.log(err.message);
     });
   }
 }
