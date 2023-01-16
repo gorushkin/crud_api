@@ -1,16 +1,17 @@
 import { server } from './app';
 import { config } from './config';
 import { addUser, deleteUser, getUser, getUsers, updateUser } from './controllers';
+import { errorHandler } from './error';
 
 if (!config.PORT) throw new Error('Set port in .env');
 
-server.get('/api/user/:id', getUser);
-server.get('/api/user', getUsers);
+server.get('/api/user/:id', errorHandler.bind(null, getUser));
+server.get('/api/user', errorHandler.bind(null, getUsers));
 
-server.post('/api/users', addUser);
+server.post('/api/users', errorHandler.bind(null, addUser));
 
-server.put('/api/user/:id', updateUser);
+server.put('/api/user/:id', errorHandler.bind(null, updateUser));
 
-server.delete('/api/user/:id', deleteUser);
+server.delete('/api/user/:id', errorHandler.bind(null, deleteUser));
 
 server.listen(Number(config.PORT));

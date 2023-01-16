@@ -78,7 +78,10 @@ class App {
         await this.handler(customRequest, res as CustomResponse);
       } catch (error) {
         if (!(error instanceof AppError)) throw error;
-        res.writeHead(error.statusCode).end({ message: error.message });
+        res
+          .setHeader('Content-Type', 'application/json')
+          .writeHead(error.statusCode)
+          .end(JSON.stringify({ message: error.message }));
       }
     });
 

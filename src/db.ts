@@ -38,7 +38,7 @@ class DB {
     return user;
   }
 
-  async addUser({ username, age, hobbies }: UserData): Promise<User>  {
+  async addUser({ username, age, hobbies }: UserData): Promise<User> {
     const user = new User(username, age, hobbies);
     this.db.push(user);
     return user;
