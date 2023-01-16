@@ -8,7 +8,7 @@ if (!config.PORT) throw new Error('Set port in .env');
 server.get('/api/user/:id', errorHandler.bind(null, getUser));
 server.get('/api/user', errorHandler.bind(null, getUsers));
 
-server.post('/api/users', errorHandler.bind(null, addUser));
+server.post('/api/user', errorHandler.bind(null, addUser));
 
 server.put('/api/user/:id', errorHandler.bind(null, updateUser));
 

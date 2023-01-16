@@ -67,14 +67,13 @@ class App {
 
   async listen(port: number) {
     this.server.listen(port);
+
     this.server.on('request', async (req, res) => {
       const customRequest = req as CustomRequest;
 
-      const body = await getBody(req);
-
-      customRequest.body = body;
-
       try {
+        const body = await getBody(req);
+        customRequest.body = body;
         await this.handler(customRequest, res as CustomResponse);
       } catch (error) {
         if (!(error instanceof AppError)) throw error;

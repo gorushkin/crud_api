@@ -63,20 +63,24 @@ export const getBody = async (stream: Stream): Promise<any> => {
 
     stream.on('end', () => {
       if (!!body.length) {
-        resolve(JSON.parse(body));
+        try {
+          const json = JSON.parse(body);
+          resolve(json);
+        } catch (error) {
+          reject(new AppError(500, 'There is Something wrong'));
+        }
       }
-      resolve({});
     });
 
-    stream.on('error', reject);
+    stream.on('error', () => reject(new AppError(500, 'There is Something wrong')));
   });
 };
 
 export const validateId = (id: string) => {
   if (!uuidValidate(id)) throw new AppError(400, 'The id is not valid');
-}
+};
 
 export const checkUser = async (id: string) => {
   const user = await service.getUser(id);
   if (!user) throw new AppError(404, 'User not found');
-}
+};
